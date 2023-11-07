@@ -12,7 +12,7 @@ public class ASDI implements Parser{
     }
     public void analisis(){
         Stack<String> stack = new Stack<>();//creamos la pila
-        stack.push("EOF");//llenamos con fin de cadena
+        stack.push("$");//llenamos con fin de cadena
         stack.push("Q");//se llena con el primer elemento
         String x=stack.peek();//apuntamos el tope de la pila
         while (x!="EOF") {
@@ -21,58 +21,36 @@ public class ASDI implements Parser{
                 x=stack.peek();//apuntamos en lo mas alto de la pila
                 i++;
                 preanalisis=this.tokens.get(i);
-                System.out.println("Entramos en if verdadero");
-                System.out.println("Prenalisis vale:"+preanalisis);
-                System.out.println("valor de x:"+x);
             }
-            else if(x.equals("Q")){
-                System.out.println("Entramos en Q");
+
+            else if(x=="Q"){
                 stack.pop();
                 stack.push("T");
                 stack.push("FROM");
                 stack.push("D");
-                stack.push("SELECT");
+                stack.push("select");
                 x=stack.peek();
-                System.out.println("Salimos de Q con valor de x:"+x);
-                System.out.println("Prenalisis vale:"+preanalisis);
             }
-            else if(x.equals("D")){
-                System.out.println("entrnado en D");
-               if(preanalisis.tipo.name().equals("DISTINCT")){
-                System.out.println("entrnado en D primer if x:");
-                    stack.pop();
+            else if(x=="D"){
+                stack.pop();
+                if(preanalisis.lexema=="distinct"){
                     stack.push("P");
-                    stack.push("DISTINCT");
+                    stack.push("distinct");
                     x=stack.peek();
-               }
-               else if(preanalisis.tipo.name().equals("ASTERISCO")||preanalisis.tipo.name().equals("IDENTIFICADOR")){
-                    stack.pop();
+                }else{
                     stack.push("P");
-                    x=stack.peek();
-               }
-               else{
-                System.out.println("Error: Se esperaba un id o * o distinct");
-                hayErrores = true; // Marca que se ha encontrado un error
-                break;
-               }
-            }
-            else if(x.equals("P")){
-                System.out.println("El valor de preanalisis: "+preanalisis.tipo.name());
-                if(preanalisis.tipo.name().equals("ASTERISCO")){
-                    stack.pop();
-                    stack.push("ASTERISCO");
                     x=stack.peek();
                 }
-                else if(preanalisis.tipo.name().equals("IDENTIFICADOR")){
-                    stack.pop();
+            }
+            else if(x=="P"){
+                stack.pop();
+                if(preanalisis.lexema=="*"){
+                    stack.push("*");
+                    x=stack.peek();
+                }else{
                     stack.push("A");
                     x=stack.peek();
                 }
-                else{
-                System.out.println("Error: Se esperaba un id o *");
-                hayErrores = true;
-                break;
-               }
             }
             else if(x.equals("A")){
                 if(preanalisis.tipo.name().equals("IDENTIFICADOR")){
@@ -199,8 +177,6 @@ public class ASDI implements Parser{
             }
             else{
                 System.out.println("Se ha encontrado errores: ");
-                hayErrores = true;
-                break;
             }
         }
     }
