@@ -25,12 +25,16 @@ public class Principal {
     public static void ejecutar(String source){
        Scanner scanner= new Scanner(source);
         List<Token> tokens= scanner.scanTokens();
+       /* 
         for(Token token : tokens){
             System.out.println(token);
         }
-
-        Parser parser=new ASDI(tokens);
-        parser.parse();
-        
+        */ 
+        Parser parser = new ASDI(tokens);
+        boolean exito = parser.parse(); // Llama al método parse y almacena el resultado
+    
+        if(exito){
+            System.out.println("Análisis exitoso. No se encontraron errores.");
+        }
     }
 }
