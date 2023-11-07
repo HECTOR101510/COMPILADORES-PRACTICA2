@@ -12,7 +12,7 @@ public class ASDI implements Parser{
     }
     public void analisis(){
         Stack<String> stack = new Stack<>();//creamos la pila
-        stack.push("$");//llenamos con fin de cadena
+        stack.push("EOF");//llenamos con fin de cadena
         stack.push("Q");//se llena con el primer elemento
         String x=stack.peek();//apuntamos el tope de la pila
         while (x!="EOF") {
@@ -22,35 +22,47 @@ public class ASDI implements Parser{
                 i++;
                 preanalisis=this.tokens.get(i);
             }
-
-            else if(x=="Q"){
+            else if(x.equals("Q")){
                 stack.pop();
                 stack.push("T");
                 stack.push("FROM");
                 stack.push("D");
-                stack.push("select");
+                stack.push("SELECT");
                 x=stack.peek();
             }
-            else if(x=="D"){
-                stack.pop();
-                if(preanalisis.lexema=="distinct"){
+            else if(x.equals("D")){
+               if(preanalisis.tipo.name().equals("DISTINCT")){stack.pop();
                     stack.push("P");
-                    stack.push("distinct");
+                    stack.push("DISTINCT");
                     x=stack.peek();
-                }else{
+               }
+               else if(preanalisis.tipo.name().equals("ASTERISCO")||preanalisis.tipo.name().equals("IDENTIFICADOR")){
+                    stack.pop();
                     stack.push("P");
+                    x=stack.peek();
+               }
+               else{
+                System.out.println("Error: Se esperaba un id o * o distinct");
+                hayErrores = true; // Marca que se ha encontrado un error
+                break;
+               }
+            }
+            else if(x.equals("P")){
+                if(preanalisis.tipo.name().equals("ASTERISCO")){
+                    stack.pop();
+                    stack.push("ASTERISCO");
                     x=stack.peek();
                 }
-            }
-            else if(x=="P"){
-                stack.pop();
-                if(preanalisis.lexema=="*"){
-                    stack.push("*");
-                    x=stack.peek();
-                }else{
+                else if(preanalisis.tipo.name().equals("IDENTIFICADOR")){
+                    stack.pop();
                     stack.push("A");
                     x=stack.peek();
                 }
+                else{
+                System.out.println("Error: Se esperaba un id o *");
+                hayErrores = true;
+                break;
+               }
             }
             else if(x.equals("A")){
                 if(preanalisis.tipo.name().equals("IDENTIFICADOR")){
@@ -177,6 +189,8 @@ public class ASDI implements Parser{
             }
             else{
                 System.out.println("Se ha encontrado errores: ");
+                hayErrores = true;
+                break;
             }
         }
     }
@@ -186,4 +200,3 @@ public class ASDI implements Parser{
         return !hayErrores;
     }
 }
-//hola aqui ultma
